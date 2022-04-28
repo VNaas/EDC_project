@@ -108,17 +108,24 @@ class Dataset:
         histograms are genres.
         """
         plt.subplots(2,2)
+        all_params = {}
         for i in range(len(self.genres)):
             samples = self.train_data[self.train_data.index == self.genreIDs[i]]
             my_label = self.genres[i]
             j = 1
+            all_params[self.genres[i]] = {}
             for feature in self.features:
                 plt.subplot(2,2,j)
                 data = samples.loc[:,feature]
+                mean = data.mean()
+                var = data.var()
+                all_params[self.genres[i]] = {feature: {'mean':  mean}}
+                all_params[self.genres[i]] = {feature: {'var':  var}}
                 plt.hist(data, bins = 20, alpha = 0.25, label = my_label)
                 plt.title(feature)
                 j += 1
                 plt.legend(loc = 'upper left')
+        return all_params
 
 
 
@@ -131,8 +138,8 @@ class Dataset:
             #genres = ['pop', 'metal', 'disco', 'blues', 'reggae', 'classical', 'rock', 'hip-hop','country','jazz']
             fig = plt.figure(figsize=(12, 9))
             ax = Axes3D(fig)
-            for i in range(10):
-                samples = self.train_data[self.train_data.index == i]
+            for i in range(len(self.genres)):
+                samples = self.train_data[self.train_data.index == self.genreIDs[i]]
                 x = samples.loc[:,self.features[0]]
                 y = samples.loc[:,self.features[1]]
                 z = samples.loc[:,self.features[2]]
