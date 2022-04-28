@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 
+from cProfile import label
 from json.encoder import py_encode_basestring_ascii
 from unittest import case
 from matplotlib import colors
@@ -149,6 +150,30 @@ class Dataset:
             ax.axes.set_zlabel(self.features[2])
             ax.legend()
             ax.set_title("Scatter plot of three features")
+        else:
+            print("Did not plot 2D because of too many/little features")
+
+    def two_feature_plot(self):
+        """
+        Makes a 2-Dimensional scatter plot of a 2D feature space.
+        Note that the function does not call plt.show()
+        """
+        if len(self.features) == 2:
+            # fig = plt.figure(figsize=(12, 9))
+
+            for i in range(10):
+                samples = self.train_data[self.train_data.index == i]
+                x = samples.loc[:,self.features[0]]
+                y = samples.loc[:,self.features[1]]
+                plt.scatter(x.values,y.values)
+            plt.title("Scatter plot of two features")
+            plt.xlabel(self.features[0])
+            plt.ylabel(self.features[1])
+            plt.legend(self.genres)
+            
+        else:
+            print("Did not plot 2D because of too many/little features")
+            
 
     def classify(self, conf_matrix = False):
         """
