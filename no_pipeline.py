@@ -50,26 +50,26 @@ class Dataset:
             'rock':6, 'hip_hop':7, 'country':8,'jazz':9}
         if genres == None:
             self.genres=[None]*len(genredict)
-            genreIDs = [None]*len(self.genres)   
+            self.genreIDs = [None]*len(self.genres)   
             for key in genredict:    
-                genreIDs[genredict[key]]=genredict[key]
+                self.genreIDs[genredict[key]]=genredict[key]
                 self.genres[genredict[key]] = key
         else:
             self.genres = genres
-            genreIDs = [None]*len(genres)
+            self.genreIDs = [None]*len(genres)
             for i in range(len(genres)):
-                genreIDs[i] = genredict[genres[i]]
+                self.genreIDs[i] = genredict[genres[i]]
 
         frames = []
-        for i in range(len(genreIDs)):
-            frames.append(self.train_data[self.train_data.index == genreIDs[i]])
+        for i in range(len(self.genreIDs)):
+            frames.append(self.train_data[self.train_data.index == self.genreIDs[i]])
         self.train_data = pd.concat(frames)
         self.train_labels = self.train_data.index
         print(self.train_data.head)
 
         frames = []
-        for i in range(len(genreIDs)):
-            frames.append(self.test_data[self.test_data.index == genreIDs[i]])
+        for i in range(len(self.genreIDs)):
+            frames.append(self.test_data[self.test_data.index == self.genreIDs[i]])
         self.test_data = pd.concat(frames)
         self.test_labels = self.test_data.index
         print(self.test_data.head)
@@ -109,15 +109,16 @@ class Dataset:
         """
         plt.subplots(2,2)
         for i in range(len(self.genres)):
-            samples = self.train_data[self.train_data.index == self.genres[i]]
+            samples = self.train_data[self.train_data.index == self.genreIDs[i]]
             my_label = self.genres[i]
             j = 1
             for feature in self.features:
                 plt.subplot(2,2,j)
                 data = samples.loc[:,feature]
                 plt.hist(data, bins = 20, alpha = 0.25, label = my_label)
+                plt.title(feature)
                 j += 1
-
+                plt.legend(loc = 'upper left')
 
 
 
