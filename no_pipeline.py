@@ -20,37 +20,69 @@ class Dataset:
     """Class for classifying samples using the
         knn-method"""
 
-    def __init__(self,filename, k, normalization_method = 'min-max', features = None, genres = None):
+    def __init__(self,filename, k, features = None, genres = None):
         # TODO Should be able to initialize with a set of genres,
         # And  make the data set only out of these. See how it's
         # done in the first line in the for loop of three_feature_plot()
         # It might help
         self.k = k
         data_frame = pd.read_csv(filename, sep='\t')
-        print(data_frame.head())
-        # self.features = features
+        train_data = data_frame.loc[data_frame['Type'] == 'Train']
+        test_data = data_frame.loc[data_frame['Type'] == 'Test']
         if features == None:
             features = list(data_frame.columns.values)[2:65]
 
+        ## Extract only wanted features
         self.features = features
-        self.data_set = data_frame[features]
-        self.labels = data_frame[['GenreID']]
-        self.genredict = {  'pop':0, 'metal':1,'disco':2,\
+        self.train_data = train_data[features]
+        self.train_labels = train_data[['GenreID']]
+        self.train_data.index = self.train_labels['GenreID']
+
+        self.test_data = test_data[features]
+        self.test_labels = test_data[['GenreID']]
+        self.test_data.index = self.test_labels['GenreID']
+
+        print(self.test_data.head)
+        print(self.train_data.head)
+        ## Extract only wanted genres
+        genredict = {  'pop':0, 'metal':1,'disco':2,\
             'blues':3, 'reggae':4, 'classical':5,\
             'rock':6, 'hip_hop':7, 'country':8,'jazz':9}
+        if genres == None:
+            self.genres=[None]*len(genredict)
+            genreIDs = [None]*len(self.genres)   
+            for key in genredict:    
+                genreIDs[genredict[key]]=genredict[key]
+                self.genres[genredict[key]] = key
+        else:
+            self.genres = genres
+            genreIDs = [None]*len(genres)
+            for i in range(len(genres)):
+                genreIDs[i] = genredict[genres[i]]
 
-        self.train_data, self.test_data, self.train_labels, self.test_labels = \
-            train_test_split(self.data_set, self.labels, shuffle = False, train_size = 0.8)
+        frames = []
+        for i in range(len(genreIDs)):
+            frames.append(self.train_data[self.train_data.index == genreIDs[i]])
+        self.train_data = pd.concat(frames)
+        self.train_labels = self.train_data.index
+        print(self.train_data.head)
+
+        frames = []
+        for i in range(len(genreIDs)):
+            frames.append(self.test_data[self.test_data.index == genreIDs[i]])
+        self.test_data = pd.concat(frames)
+        self.test_labels = self.test_data.index
+        print(self.test_data.head)
+        ## Split into training and testing data
+        # self.train_data, self.test_data, self.train_labels, self.test_labels = \
+        #     train_test_split(self.data_set, self.labels, shuffle = False, train_size = 0.8)
         
         self.pca = PCA()
-        # self.train_data_df = pd.DataFrame(self.train_data,\
-        #      columns = features, index = self.train_labels['GenreID'])
-        self.train_data.index = self.train_labels['GenreID']
+        #self.train_data.index = self.train_labels['GenreID']
         print("Initiated dataset ocject. Training data head: \n ",\
             self.train_data.head)
-    
 
-        print("hei")
+
 
     def hist(self):
         self.train_data.hist()
@@ -81,7 +113,7 @@ class Dataset:
         Note that the function does not call plt.show()
         """
         if len(self.features) == 3:
-            genres = ['pop', 'metal', 'disco', 'blues', 'reggae', 'classical', 'rock', 'hip-hop','country','jazz']
+            #genres = ['pop', 'metal', 'disco', 'blues', 'reggae', 'classical', 'rock', 'hip-hop','country','jazz']
             fig = plt.figure(figsize=(12, 9))
             ax = Axes3D(fig)
             for i in range(10):
@@ -89,7 +121,7 @@ class Dataset:
                 x = samples.loc[:,self.features[0]]
                 y = samples.loc[:,self.features[1]]
                 z = samples.loc[:,self.features[2]]
-                ax.scatter(x,y,z, label=genres[i])
+                ax.scatter(x,y,z, label=self.genres[i])
             ax.axes.set_xlabel(self.features[0])
             ax.axes.set_ylabel(self.features[1])
             ax.axes.set_zlabel(self.features[2])
@@ -107,7 +139,7 @@ class Dataset:
         classifier.fit(self.train_data,self.train_labels)
         genres = ['pop', 'metal', 'disco', 'blues', 'reggae', 'classical', 'rock', 'hip-hop','country','jazz']        
         if conf_matrix: 
-            ConfusionMatrixDisplay.from_estimator(classifier, self.test_data, self.test_labels, display_labels = genres)
+            ConfusionMatrixDisplay.from_estimator(classifier, self.test_data, self.test_labels, display_labels = self.genres)
         error_rate = (1 - classifier.score(self.test_data, self.test_labels))
         return error_rate
 
@@ -124,8 +156,8 @@ class Dataset:
         pca.fit(self.train_data)
         pca_train_data =  pca.fit_transform(self.train_data)
         pca_test_data = pca.transform(self.test_data)
-        self.train_data.loc[:,:] = pca_train_data
-        self.test_data.loc[:,:] = pca_test_data
+        self.train_data = pd.DataFrame(pca_train_data, index = self.train_data.index)
+        self.test_data = pd.DataFrame(pca_test_data, index = self.test_data.index)
         self.pca = pca
     
     def plot_train_data_pca(self):
@@ -166,31 +198,3 @@ class Dataset:
         plt.title('Scree Plot')
 
 
-genre_data = Dataset('Classification music/GenreClassData_30s.txt', 5, 'min-max',None)
-
-#er = 1
-#for i in range(1,63):   
-#    genre_data = Dataset('Classification music/GenreClassData_30s.txt', 5, 'min-max',None)
-#    genre_data.scale('min-max')
-# 
-#    genre_data.pca(i)
-#    er_i = genre_data.classify(False)
-#    if er_i <= er:
-#        er = er_i
-#        best_classification = i
-# fig = plt.figure()
-# ax = fig.add_subplot(projection='3d')
-# ax.scatter(genre_data.train_data[:,0], genre_data.train_data[:,1], genre_data.train_data[:,2])
-# fig = plt.figure(figsize=(12, 9))
-# ax = Axes3D(fig)
-# for grp_name, grp_idx in genre_data.train_data.groupby('grp').groups.items():
-#     y = genre_data.train_data.iloc[grp_idx,1]
-#     x = genre_data.train_data.iloc[grp_idx,0]
-#     z = genre_data.train_data.iloc[grp_idx,2]
-#     ax.scatter(x,y,z, label=grp_name)
-
-#print(er)
-# plt.show()
-#genre_data.plot_pca()
-#print("hei")
-#genre_data.classify()
