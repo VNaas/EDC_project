@@ -82,11 +82,6 @@ class Dataset:
         print("Initiated dataset ocject. Training data head: \n ",\
             self.train_data.head)
 
-
-
-    def hist(self):
-        self.train_data.hist()
-
     def scale(self, normalization_method = 'min-max'):
         """
         Trains a scaling object to the training set and uses it to
@@ -106,6 +101,25 @@ class Dataset:
         scaled_test_data = scaler.transform(self.test_data)
         self.test_data.loc[:,:] = scaled_test_data
         print("Scaled data: \n", self.train_data.head)
+
+    def hist2x2(self):
+        """
+        Makes a 2x2 subplot where cells are features and the overlapping
+        histograms are genres.
+        """
+        plt.subplots(2,2)
+        for i in range(len(self.genres)):
+            samples = self.train_data[self.train_data.index == self.genres[i]]
+            my_label = self.genres[i]
+            j = 1
+            for feature in self.features:
+                plt.subplot(2,2,j)
+                data = samples.loc[:,feature]
+                plt.hist(data, bins = 20, alpha = 0.25, label = my_label)
+                j += 1
+
+
+
 
     def three_feature_plot(self):
         """
