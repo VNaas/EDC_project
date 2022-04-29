@@ -10,6 +10,7 @@ feat = ['spectral_centroid_mean', 'mfcc_1_mean', 'tempo']
 genre_data = Dataset('Classification music/GenreClassData_30s.txt', 5, feat, gen)
 genre_data.scale()
 
-genre_data.classify(True)
+er = genre_data.classify(True)
+print(er)
 genre_data.three_feature_plot()
 plt.show()

@@ -43,8 +43,6 @@ class Dataset:
         self.test_labels = test_data[['GenreID']]
         self.test_data.index = self.test_labels['GenreID']
 
-        print(self.test_data.head)
-        print(self.train_data.head)
         ## Extract only wanted genres
         genredict = {  'pop':0, 'metal':1,'disco':2,\
             'blues':3, 'reggae':4, 'classical':5,\
@@ -66,22 +64,15 @@ class Dataset:
             frames.append(self.train_data[self.train_data.index == self.genreIDs[i]])
         self.train_data = pd.concat(frames)
         self.train_labels = self.train_data.index
-        print(self.train_data.head)
+
 
         frames = []
         for i in range(len(self.genreIDs)):
             frames.append(self.test_data[self.test_data.index == self.genreIDs[i]])
         self.test_data = pd.concat(frames)
         self.test_labels = self.test_data.index
-        print(self.test_data.head)
-        ## Split into training and testing data
-        # self.train_data, self.test_data, self.train_labels, self.test_labels = \
-        #     train_test_split(self.data_set, self.labels, shuffle = False, train_size = 0.8)
         
         self.pca = PCA()
-        #self.train_data.index = self.train_labels['GenreID']
-        print("Initiated dataset ocject. Training data head: \n ",\
-            self.train_data.head)
 
     def scale(self, normalization_method = 'min-max'):
         """
@@ -101,32 +92,34 @@ class Dataset:
 
         scaled_test_data = scaler.transform(self.test_data)
         self.test_data.loc[:,:] = scaled_test_data
-        print("Scaled data: \n", self.train_data.head)
 
-    def hist2x2(self):
+    def hist(self,m,n, legend = False):
         """
         Makes a 2x2 subplot where cells are features and the overlapping
         histograms are genres.
         """
-        plt.subplots(2,2)
-        all_params = {}
-        for i in range(len(self.genres)):
-            samples = self.train_data[self.train_data.index == self.genreIDs[i]]
-            my_label = self.genres[i]
-            j = 1
-            all_params[self.genres[i]] = {}
-            for feature in self.features:
-                plt.subplot(2,2,j)
-                data = samples.loc[:,feature]
-                mean = data.mean()
-                var = data.var()
-                all_params[self.genres[i]] = {feature: {'mean':  mean}}
-                all_params[self.genres[i]] = {feature: {'var':  var}}
-                plt.hist(data, bins = 20, alpha = 0.25, label = my_label)
-                plt.title(feature)
-                j += 1
-                plt.legend(loc = 'upper left')
-        return all_params
+        if m*n >= len(self.features):
+            plt.subplots(m,n)
+            all_params = {}
+            for i in range(len(self.genres)):
+                samples = self.train_data[self.train_data.index == self.genreIDs[i]]
+                my_label = self.genres[i]
+                j = 1
+                all_params[self.genres[i]] = {}
+                for feature in self.features:
+                    all_params[self.genres[i]][feature] = {} 
+                    plt.subplot(m,n,j)
+                    data = samples.loc[:,feature]
+                    mean = data.mean()
+                    var = data.var()
+                    all_params[self.genres[i]][feature]['mean'] = mean
+                    all_params[self.genres[i]][feature]['var'] = var
+                    plt.hist(data, bins = 40, alpha = 0.5, label = my_label)
+                    plt.title(feature)
+                    j += 1
+                    if legend: 
+                        plt.legend(loc = 'upper left')
+            return all_params
 
 
 
@@ -184,7 +177,6 @@ class Dataset:
         """
         classifier = KNeighborsClassifier(n_neighbors = self.k)
         classifier.fit(self.train_data,self.train_labels)
-        genres = ['pop', 'metal', 'disco', 'blues', 'reggae', 'classical', 'rock', 'hip-hop','country','jazz']        
         if conf_matrix: 
             ConfusionMatrixDisplay.from_estimator(classifier, self.test_data, self.test_labels, display_labels = self.genres)
         error_rate = (1 - classifier.score(self.test_data, self.test_labels))
@@ -206,6 +198,7 @@ class Dataset:
         self.train_data = pd.DataFrame(pca_train_data, index = self.train_data.index)
         self.test_data = pd.DataFrame(pca_test_data, index = self.test_data.index)
         self.pca = pca
+        self.features = self.train_data.columns.values
     
     def plot_train_data_pca(self):
         """
