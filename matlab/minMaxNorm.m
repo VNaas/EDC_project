@@ -1,7 +1,7 @@
-function normalized = minMaxNorm(x)
+function normalized = minMaxNorm(x,min,max)
 
 normalized = ...
-    (x - min(x)) ... 
-    / (max(x)-min(x));
+    (x - min) ... 
+    / (max-min);
 end
 
