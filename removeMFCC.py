@@ -10,7 +10,7 @@ feat = ['spectral_centroid_mean', 'spectral_rolloff_mean', 'tempo']
 genre_data = Dataset('Classification music/GenreClassData_30s.txt', 5, feat, gen)
 genre_data.scale()
 
-er  = genre_data.classify(True)
+er  = genre_data.classify('knn',True)
 genre_data.three_feature_plot()
-print(er)
+print("Error rate when removing MFCC:" , er)
 plt.show()

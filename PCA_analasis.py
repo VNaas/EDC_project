@@ -17,11 +17,11 @@ from sklearn.metrics import ConfusionMatrixDisplay
 from mpl_toolkits.mplot3d import Axes3D
 from no_pipeline import Dataset
 
-gen = ['pop', 'metal', 'jazz']
+gen = ['pop', 'disco', 'metal', 'classical']
 
-feat = ['spectral_bandwidth_mean', 'tempo']
+feat = ['spectral_rolloff_mean','spectral_centroid_mean','mfcc_1_mean', 'tempo']
 genre_data = Dataset('Classification music/GenreClassData_30s.txt', 5, feat, gen)
-genre_data.hist()
+# genre_data.hist(4,4)
 genre_data.scale()
 # print("Scaled data. printing head")
 # print(genre_data.train_data.head)
@@ -31,14 +31,16 @@ genre_data.scale()
 
 # plt.show()
 
-genre_data.do_pca(3)
-genre_data.scree_plot()
-genre_data.classify(True)
-genre_data.plot_train_data_pca()
-genre_data.two_feature_plot()
+# genre_data.do_pca(3)
+# genre_data.scree_plot()
+er = genre_data.classify('knn',True)
+print("Error rate: ", er)
+# genre_data.plot_train_data_pca()
+# genre_data.two_feature_plot()
 
 
-genres = ['pop', 'metal', 'disco', 'blues', 'reggae', 'classical', 'rock', 'hip-hop','country','jazz']
+
+# genres = ['pop', 'metal', 'disco', 'blues', 'reggae', 'classical', 'rock', 'hip-hop','country','jazz']
 
 
 plt.show()
