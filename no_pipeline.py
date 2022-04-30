@@ -178,7 +178,7 @@ class Dataset:
         classifier = KNeighborsClassifier(n_neighbors = self.k)
         classifier.fit(self.train_data,self.train_labels)
         if conf_matrix: 
-            ConfusionMatrixDisplay.from_estimator(classifier, self.test_data, self.test_labels, display_labels = self.genres)
+            ConfusionMatrixDisplay.from_estimator(classifier, self.test_data, self.test_labels, display_labels = self.genres, colorbar = False, xticks_rotation=45, cmap = "Blues")
         error_rate = (1 - classifier.score(self.test_data, self.test_labels))
         return error_rate
 
