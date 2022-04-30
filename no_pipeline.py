@@ -1,31 +1,23 @@
 #!/usr/bin/env python3
 
 
-from cProfile import label
-from json.encoder import py_encode_basestring_ascii
-from unittest import case
 from matplotlib import colors
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from pyparsing import col
-from sklearn.model_selection import train_test_split
-from sklearn.neighbors import  KNeighborsClassifier
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
-from sklearn.decomposition import PCA
-from sklearn.pipeline import Pipeline
-from sklearn.metrics import ConfusionMatrixDisplay
-from mpl_toolkits.mplot3d import Axes3D
+from sklearn.model_selection    import train_test_split
+from sklearn.neighbors          import KNeighborsClassifier
+from sklearn.svm                import SVC
+from sklearn.preprocessing      import MinMaxScaler, StandardScaler
+from sklearn.decomposition      import PCA
+from sklearn.metrics            import ConfusionMatrixDisplay
+from mpl_toolkits.mplot3d       import Axes3D
 
 class Dataset:
     """Class for classifying samples using the
         knn-method"""
 
     def __init__(self,filename, k, features = None, genres = None):
-        # TODO Should be able to initialize with a set of genres,
-        # And  make the data set only out of these. See how it's
-        # done in the first line in the for loop of three_feature_plot()
-        # It might help
         self.k = k
         data_frame = pd.read_csv(filename, sep='\t')
         train_data = data_frame.loc[data_frame['Type'] == 'Train']
@@ -168,14 +160,17 @@ class Dataset:
             print("Did not plot 2D because of too many/little features")
             
 
-    def classify(self, conf_matrix = False):
+    def classify(self, method = 'knn', conf_matrix = False):
         """
         Returns: Errot rate
         Trains a KNN-classifier using the training data and 
         tests it on the test set. If conf_matrix is true, it will also
         create a confusion matrix.
         """
-        classifier = KNeighborsClassifier(n_neighbors = self.k)
+        if method == 'knn':
+            classifier = KNeighborsClassifier(n_neighbors = self.k)
+        elif method == 'SVM':
+            classifier = SVC(C=100, kernel='linear')
         classifier.fit(self.train_data,self.train_labels)
         if conf_matrix: 
             ConfusionMatrixDisplay.from_estimator(classifier, self.test_data, self.test_labels, display_labels = self.genres)

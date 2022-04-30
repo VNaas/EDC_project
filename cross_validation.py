@@ -1,21 +1,16 @@
-#!/usr/bin/env python3
+from no_pipeline import Dataset
+from sklearn.model_selection    import train_test_split
+from matplotlib import pyplot as plt
+import pandas as pd
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import classification_report
 from sklearn.svm import SVC
 
-# Loading the Digits dataset
-digits = datasets.load_digits()
 
-# To apply an classifier on this data, we need to flatten the image, to
-# turn the data in a (samples, feature) matrix:
-n_samples = len(digits.images)
-X = digits.images.reshape((n_samples, -1))
-y = digits.target
-
-# Split the dataset in two equal parts
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=0)
+genre_data = Dataset('Classification music/GenreClassData_30s.txt', 5, None, None)
+X_train, X_test, y_train, y_test = train_test_split(genre_data.train_data.values, genre_data.train_labels.values, test_size=0.2,random_state=1)
 
 # Set the parameters by cross-validation
 tuned_parameters = [
@@ -52,6 +47,3 @@ for score in scores:
     y_true, y_pred = y_test, clf.predict(X_test)
     print(classification_report(y_true, y_pred))
     print()
-
-# Note the problem is too easy: the hyperparameter plateau is too flat and the
-# output model is the same for precision and recall with ties in quality.

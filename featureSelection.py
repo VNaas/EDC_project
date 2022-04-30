@@ -6,7 +6,7 @@ import seaborn as sns
 from IPython.display import display
 
 from no_pipeline import Dataset
-filename = 'Classification music/GenreClassData_30s.txt'
+filename = 'https://raw.githubusercontent.com/VNaas/EDC_project/main/Classification%20music/GenreClassData_30s.txt'
 gen = ['pop', 'metal', 'disco','classical']
 feat = ['spectral_centroid_mean', 'mfcc_1_mean', 'spectral_rolloff_mean', 'spectral_contrast_var']
 genre_data = Dataset(filename, 5, feat, None)
