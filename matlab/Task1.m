@@ -53,7 +53,9 @@ end
 ActualClasses=GenreClassData30s(793:end,66);
 
 conf_matrix=confusionmat(ActualClasses,ClassifierGuesses);
-confusionchart(conf_matrix);
+label={'pop','metal','disco','blues','reggae','classical','rock','hip hop','country','jazz'};
+cc=confusionchart(conf_matrix,label);
+sortClasses(cc,{'pop','metal','disco','blues','reggae','classical','rock','hip hop','country','jazz'});
 
 misses=0;
 hits=0;
