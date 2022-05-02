@@ -1,20 +1,10 @@
 #!/usr/bin/env python3
 
-from unittest import case
-from matplotlib import colors
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
-from pyparsing import col
 from sklearn.model_selection import cross_val_score, train_test_split
-from sklearn.neighbors import  KNeighborsClassifier
-from sklearn.preprocessing import MinMaxScaler, StandardScaler
-from sklearn.decomposition import PCA
-from sklearn.pipeline import Pipeline
-from sklearn.metrics import ConfusionMatrixDisplay
-from mpl_toolkits.mplot3d import Axes3D
 from no_pipeline import Dataset
-from sklearn.model_selection import KFold, StratifiedKFold
+from sklearn.model_selection import KFold
 from sklearn.svm import SVC
 
 

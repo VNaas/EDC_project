@@ -9,7 +9,7 @@ from sklearn.neighbors       import KNeighborsClassifier
 
 
 from no_pipeline import Dataset
-filename = 'https://raw.githubusercontent.com/VNaas/EDC_project/main/Classification%20music/GenreClassData_30s.txt'
+filename = 'Classification music/GenreClassData_30s.txt'
 feat = ['spectral_centroid_mean', 'mfcc_1_mean', 'spectral_rolloff_mean', 'spectral_contrast_var']
 # genre_data = Dataset(filename, 5, feat, None)
 # genre_data.scale()
@@ -22,14 +22,12 @@ feat = ['spectral_centroid_mean', 'mfcc_1_mean', 'spectral_rolloff_mean', 'spect
 
 ## LOOK AT CORRELATION BETWEEN FEATURES
 test_features = ['rmse_mean', 'spectral_bandwidth_mean', 'spectral_contrast_var','chroma_stft_12_std']
-# for f in test_features:
-#     feat[3] = f
-#     genre_data = Dataset(filename, 5, feat, None)
-#     genre_data.scale()
-#     er = genre_data.classify()
-#     print("Error rate using " + f + " as fourth feature:\n\t", er)
-#     genre_data.train_data.index = list(range(len(genre_data.train_data.index))) # to avoid a pairplot error
-#     sns.pairplot(genre_data.train_data)
+for f in test_features:
+    feat[3] = f
+    genre_data = Dataset(filename, 5, feat, None)
+    genre_data.scale()
+    genre_data.train_data.index = list(range(len(genre_data.train_data.index))) # to avoid a pairplot error
+    sns.pairplot(genre_data.train_data)
 
 ## Cross validate
 kfold = KFold(shuffle=True, random_state=1)
