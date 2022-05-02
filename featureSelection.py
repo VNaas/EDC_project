@@ -4,38 +4,55 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from IPython.display import display
+from sklearn.model_selection import KFold, cross_val_score
+from sklearn.neighbors       import KNeighborsClassifier
+
 
 from no_pipeline import Dataset
 filename = 'https://raw.githubusercontent.com/VNaas/EDC_project/main/Classification%20music/GenreClassData_30s.txt'
-gen = ['pop', 'metal', 'disco','classical']
 feat = ['spectral_centroid_mean', 'mfcc_1_mean', 'spectral_rolloff_mean', 'spectral_contrast_var']
-genre_data = Dataset(filename, 5, feat, None)
-genre_data.scale()
+# genre_data = Dataset(filename, 5, feat, None)
+# genre_data.scale()
 
 
-## LOOK AT HISTOGRAM AND ERROR RATE
-genre_data.hist(2,2,True)
-er = genre_data.classify(True)
-print(er)
+# ## LOOK AT HISTOGRAM AND ERROR RATE
+# genre_data.hist(2,2,True)
+# er = genre_data.classify()
+# print(er)
 
 ## LOOK AT CORRELATION BETWEEN FEATURES
 test_features = ['rmse_mean', 'spectral_bandwidth_mean', 'spectral_contrast_var','chroma_stft_12_std']
+# for f in test_features:
+#     feat[3] = f
+#     genre_data = Dataset(filename, 5, feat, None)
+#     genre_data.scale()
+#     er = genre_data.classify()
+#     print("Error rate using " + f + " as fourth feature:\n\t", er)
+#     genre_data.train_data.index = list(range(len(genre_data.train_data.index))) # to avoid a pairplot error
+#     sns.pairplot(genre_data.train_data)
+
+## Cross validate
+kfold = KFold(shuffle=True, random_state=1)
+best_feature = ''
+best_score = 0
+genre_data = Dataset(filename, 5, feat, None)
+genre_data.scale()
+X = genre_data.train_data.values
+Y = genre_data.train_labels.values
 for f in test_features:
     feat[3] = f
-    genre_data = Dataset(filename, 5, feat, None)
-    genre_data.scale()
-    er = genre_data.classify()
-    print("Error rate using " + f + " as fourth feature:\n\t", er)
-    genre_data.train_data.index = list(range(len(genre_data.train_data.index))) # to avoid a pairplot error
-    sns.pairplot(genre_data.train_data)
+    knn = KNeighborsClassifier()
+    score = np.mean(cross_val_score(knn,X,Y,cv = kfold))
+    if score > best_score:
+        best_score = score
+        best_feature = f
 
-##CALCULATE VARIANCES
-# pd.set_option("display.max_colwidth", None,"display.max_rows",None)
-
-# description = genre_data.train_data.describe(include='all')
-# variances = genre_data.train_data.var()
-# display(variances)
-# display(description)
-
+print("Best feature: ", best_feature)
+print("score", best_score)
+feat[3] = best_feature
+genre_data = Dataset(filename, 5, feat, None)
+genre_data.scale()
+er = genre_data.classify(method='knn',conf_matrix=True)
+print("Error rate using",best_feature,"as fourth feature: ", er)
 
 plt.show()

@@ -14,7 +14,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.metrics import ConfusionMatrixDisplay
 from mpl_toolkits.mplot3d import Axes3D
 from no_pipeline import Dataset
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, StratifiedKFold
 from sklearn.svm import SVC
 
 
@@ -30,19 +30,19 @@ control = best_score
 
 
 kernels = ['rbf','linear']
-Cs = [0.01,0.1,1,10,100,1000,10000,100000]
+Cs = [0.001,0.1,1,10,100,1000,1000]
 gammas = [0.001,0.001,0.01,0.1,1,10,100,1000, 'scale','auto']
 
 best_kernel = ''
 best_C = 1
 best_gamma = 1
-kfold = KFold(shuffle=True, random_state=1)
+genre_data = Dataset('Classification music/GenreClassData_30s.txt', 5, None, None)
+genre_data.scale('z-score')
+genre_data.do_pca(45)
 for kern in kernels:
     for c in Cs:
         for gam in gammas:
-            genre_data = Dataset('Classification music/GenreClassData_30s.txt', 5, None, None)
-            genre_data.scale('z-score')
-            genre_data.do_pca(45)
+            kfold = KFold(shuffle=True, random_state=1)
             #X_train, X_test, y_train, y_test = train_test_split(genre_data.train_data.values, genre_data.train_labels.values, test_size=0.2,random_state=1)
             if kern == 'rbf':
                 svc = SVC(kernel = kern, C = c, gamma = gam)
