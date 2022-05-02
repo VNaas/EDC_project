@@ -160,7 +160,7 @@ class Dataset:
             print("Did not plot 2D because of too many/little features")
             
 
-    def classify(self, method = 'knn', conf_matrix = False):
+    def classify(self, method = 'knn', conf_matrix = False, kernel = 'rbf', C = 1, gamma = 'scale'):
         """
         Returns: Errot rate
         Trains a KNN-classifier using the training data and 
@@ -170,7 +170,10 @@ class Dataset:
         if method == 'knn':
             classifier = KNeighborsClassifier(n_neighbors = self.k)
         elif method == 'SVM':
-            classifier = SVC(C=100, kernel='linear')
+            if kernel == 'rbf':
+                classifier = SVC(kernel = kernel, C = C, gamma = gamma)
+            else:
+                classifier = SVC(kernel = kernel, C = C)
         classifier.fit(self.train_data,self.train_labels)
         if conf_matrix: 
             ConfusionMatrixDisplay.from_estimator(classifier, self.test_data, self.test_labels, display_labels = self.genres, colorbar = False, xticks_rotation=45, cmap = "Blues")
