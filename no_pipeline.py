@@ -231,7 +231,7 @@ class Dataset:
         """
         fig = plt.figure(figsize=(12, 9))
         per_var = np.round(self.pca.explained_variance_ratio_ * 100, decimals = 1)
-        labels = ['PC' + str(x) for x in range(1, len(per_var)+1)]
+        labels = [ str(x) for x in range(1, len(per_var)+1)]
         plt.bar(x=range(1,len(per_var)+1), height = per_var, tick_label = labels)
         plt.ylabel('Percentage of Explaied Vairance')
         plt.xlabel('Principle Component')
