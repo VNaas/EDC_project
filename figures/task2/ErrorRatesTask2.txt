@@ -1,6 +1,0 @@
-Error rate for the four experiments
-
-Remove tempo:                   29.11%
-Remove mfcc 1 mean:             35.44%
-Remove spectral centroid mean:  34.18%
-Remove spectral rolloff mean:   39.24%
