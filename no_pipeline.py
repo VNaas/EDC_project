@@ -85,13 +85,13 @@ class Dataset:
         scaled_test_data = scaler.transform(self.test_data)
         self.test_data.loc[:,:] = scaled_test_data
 
-    def hist(self,m,n, legend = False):
+    def hist(self,m,n, legend = False, size = (20,20)):
         """
         Makes a 2x2 subplot where cells are features and the overlapping
         histograms are genres.
         """
         if m*n >= len(self.features):
-            plt.subplots(m,n)
+            plt.subplots(m,n, figsize = size)
             all_params = {}
             for i in range(len(self.genres)):
                 samples = self.train_data[self.train_data.index == self.genreIDs[i]]
@@ -175,8 +175,10 @@ class Dataset:
             else:
                 classifier = SVC(kernel = kernel, C = C)
         classifier.fit(self.train_data,self.train_labels)
-        if conf_matrix: 
-            ConfusionMatrixDisplay.from_estimator(classifier, self.test_data, self.test_labels, display_labels = self.genres, colorbar = False, xticks_rotation=45, cmap = "Blues")
+        if conf_matrix:
+            fig, ax = plt.subplots(figsize=(10, 10))
+            ConfusionMatrixDisplay.from_estimator(classifier, self.test_data, self.test_labels,\
+                display_labels = self.genres, colorbar = False, xticks_rotation=45, cmap = "Blues",ax = ax)
         error_rate = (1 - classifier.score(self.test_data, self.test_labels))
         return error_rate
 
